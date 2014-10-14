@@ -1,0 +1,9 @@
+export VTG_USER_DEFAULT=${VTG_USER_DEFAULT:=vintage};
+export VTG_ROOT_DEFAULT=${VTG_ROOT_DEFAULT:=/Vintage};
+export VTG_COMM_DEFAULT=${VTG_COMM_DEFAULT:=$VTG_ROOT_DEFAULT/pro/Antique};
+
+export VTG_USER=${VTG_USER:=$VTG_USER_DEFAULT};
+export VTG_ROOT=${VTG_ROOT:=$VTG_ROOT_DEFAULT};
+export VTG_COMM=${VTG_COMM:=$VTG_ROOT/pro/Antique};
+
+umask 0002;

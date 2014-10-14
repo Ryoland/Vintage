@@ -1,0 +1,81 @@
+#!/bin/bash
+
+##########
+## Desc ##
+##########
+
+##########
+## Init ##
+##########
+
+ARGUMENTS=d:f:m:;
+
+HELP() {
+    echo "Usage: $0 [Arguments]";
+    echo "";
+    echo "Optional Arguments:";
+    echo "    -m The message.";
+    echo "    -f The file name the message is written.";
+    echo "    -d The directory path the file is written.";
+}
+
+source $VTG_ROOT/pro/Vintage/lib/sh/initialize;
+
+##########
+## Conf ##
+##########
+
+readonly DP_LOG_DEFAULT=$VTG_ROOT/log;
+readonly FN_LOG_DEFAULT=default;
+readonly MESSAGE_DEFAULT=-;
+
+##########
+## Func ##
+##########
+
+echo_dp_log() {
+    local dp_log=$ARG_d;
+    echo  ${dp_log:-$DP_LOG_DEFAULT};
+}
+
+echo_fn_log() {
+    local fn_log=$ARG_f;
+    echo  ${fn_log:-$FN_LOG_DEFAULT};
+}
+
+echo_fp_log() {
+    local dp_log=$(echo_dp_log);
+    local fn_log=$(echo_fn_log);
+    echo  $dp_log/$fn_log;
+}
+
+add() {
+
+    local n=($($CP_DATE '+%Y %m %d %H %M %S'));
+    local y=${n[0]}; local m=${n[1]}; local d=${n[2]};
+    local h=${n[3]}; local i=${n[4]}; local s=${n[5]};
+
+    local message=$ARG_m;
+    message=${message:-$MESSAGE_DEFAULT};
+
+    local log="$y/$m/$d $h:$i:$s $message";
+    local fp_log=$(echo_fp_log);
+
+    if [ ! -e ${fp_log%/*} ]; then
+        $CP_MKDIR -p ${fp_log%/*};
+    fi;
+
+    echo $log >> $fp_log;
+}
+
+process() {
+    add;
+}
+
+##########
+## Proc ##
+##########
+
+process;
+
+exit 0;
