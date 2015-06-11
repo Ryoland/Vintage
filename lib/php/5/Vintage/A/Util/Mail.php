@@ -98,7 +98,7 @@
                 mb_internal_encoding(self::$SMTP_ENCODING);
 
                 $name    = isset($name) ? mb_encode_mimeheader($name)     : $name;
-                $from    = isset($name) ? sprintf('%s<%s>', $name, $from) : $from;
+                $label   = isset($name) ? sprintf('%s<%s>', $name, $from) : $from;
                 $subject = mb_encode_mimeheader($subject);
                 $message = mb_convert_encoding($message, $charset, 'auto');
 
@@ -116,7 +116,7 @@
                     'X-Mailer'     => self::$SMTP_HEADER_X_MAILER
                 ), $headers);
 
-                $headers['From']    = $from;
+                $headers['From']    = $label;
                 $headers['To']      = implode(',', $tos);
                 $headers['Cc']      = implode(',', $ccs);
                 $headers['Subject'] = $subject;
