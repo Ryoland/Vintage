@@ -86,7 +86,7 @@ $DB_CNAME = isset(static::$DB_CNAME) ? static::$DB_CNAME : static::$DB_CNAME_DEF
 
                 if (isset($Database)) {
 
-                    $params = [];
+$params = isset($a['params']) ? $a['params'] : [];
 
                     if (isset($a['where'])) {
                         $res    = SQL::where($a['where']);
