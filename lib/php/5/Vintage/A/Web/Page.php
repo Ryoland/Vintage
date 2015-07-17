@@ -283,21 +283,22 @@ if (!$F) $F = $this->FORMAT;
                     $data =& $this->build();
                 }
 
-if (isset($data['data'])) {
-    if (isset($data['data']['total'])) {
-        if (!isset($data['data']['item_t'])) {
-            $data['data']['item_t'] = $data['data']['total'];
-        }
-    }
+                if (isset($data['data'])) {
+                  if (isset($data['data']['total'])) {
+                    if (!isset($data['data']['item_t'])) {
+                      $data['data']['item_t'] = $data['data']['total'];
+                    }
+                  }
 
-if (!empty($queries)) {
-  if (!isset($data['data']['item_p'])) {
-    $data['data']['item_p'] = isset($queries['item_p']) ? $queries['item_p'] : null;
-  }
-  if (!isset($data['data']['page_c'])) {
-    $data['data']['page_c'] = isset($queries['page_c']) ? $queries['page_c'] : null;
-  }
-}
+                  if (!empty($queries)) {
+                    if (!isset($data['data']['item_p'])) {
+                      $data['data']['item_p'] = isset($queries['item_p']) ? $queries['item_p'] : null;
+                    }
+                    if (!isset($data['data']['page_c'])) {
+                      $data['data']['page_c'] = isset($queries['page_c']) ? $queries['page_c'] : null;
+                    }
+                  }
+                }
 
                 $this->display($data);
 
