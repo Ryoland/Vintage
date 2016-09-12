@@ -26,6 +26,12 @@ n="\n";
 random=$(cat /dev/urandom | LC_CTYPE=C tr -cd 'a-zA-Z0-9' | fold -w 8 | head -n 1);
 commands="#!/bin/bash${n}";
 
+# Commands : Package
+
+commands="${commands} yum -y install epel-release;${n}";
+commands="${commands} yum -y install git;${n}";
+commands="${commands} yum -y update;${n}";
+
 # Commands : Firewall
 
 categories_n="rich-rule";    # Separated by a newline character
@@ -59,27 +65,29 @@ regex='^(PasswordAuthentication|PermitRootLogin|Port) ';
 
 commands="${commands} cp -f ${fp} ${fp}.backup.vintage.${random};${n}";
 commands="${commands} egrep -v \"${regex}\" ${fp} > ${fp}.${random};${n}";
-commands="${commands} echo 'PasswordAuthentication no'  >> ${fp}.${random};${n}";
-commands="${commands} echo 'PermitRootLogin no'         >> ${fp}.${random};${n}";
-commands="${commands} echo 'Port 60022'                 >> ${fp}.${random};${n}";
+commands="${commands} echo 'PasswordAuthentication no' >> ${fp}.${random};${n}";
+commands="${commands} echo 'PermitRootLogin no'        >> ${fp}.${random};${n}";
+commands="${commands} echo 'Port 60022'                >> ${fp}.${random};${n}";
 commands="${commands} mv ${fp}.${random} ${fp};${n}";
 
 # Commands : User
 
-commands="${commands} if [ \"\$(grep ^${user_name}: /etc/passwd;)\" != '' ]; then${n}";
-commands="${commands}   userdel -r ${user_name};${n}";
-commands="${commands} fi;${n}";
-commands="${commands} if [ \"\$(grep ^${group_name}: /etc/group;)\" != '' ]; then${n}";
-commands="${commands}   groupdel ${group_name};${n}";
-commands="${commands} fi;${n}";
+dp_home="/home/${user_name}";
+dp_root="${dp_home}/Vintage/pro";
+fp_bash="${dp_home}/.bashrc";
+
 commands="${commands} groupadd ${group_name};${n}";
 commands="${commands} useradd -g ${group_name} ${user_name};${n}";
 commands="${commands} groupmod -g ${group_id} ${group_name};${n}";
 commands="${commands} usermod -u ${user_id} -g ${group_name} ${user_name};${n}";
-commands="${commands} mkdir -m 700 /home/${user_name}/.ssh;${n}";
-commands="${commands} echo '${ssh_key}' > /home/${user_name}/.ssh/authorized_keys;${n}";
-commands="${commands} chmod 600 /home/${user_name}/.ssh/authorized_keys;${n}";
-commands="${commands} chown -R ${user_name}:${group_name} /home/${user_name};${n}";
+commands="${commands} mkdir -m 700 ${dp_home}/.ssh;${n}";
+commands="${commands} echo '${ssh_key}' > ${dp_home}/.ssh/authorized_keys;${n}";
+commands="${commands} chmod 600 ${dp_home}/.ssh/authorized_keys;${n}";
+commands="${commands} mkdir -p ${dp_root};${n}";
+commands="${commands} git clone https://github.com/Ryoland/Vintage.git ${dp_root}/Vintage;${n}";
+commands="${commands} echo 'export VTG_ROOT=${dp_root};'    >> ${fp_bash};${n}";
+commands="${commands} echo 'export VTG_STAGE=${user_name};' >> ${fp_bash};${n}";
+commands="${commands} chown -R ${user_name}:${group_name} ${dp_home};${n}";
 
 # Commands : Sudoers
 
@@ -96,8 +104,8 @@ commands="${commands} done;${n}";
 
 # Commands : Execution
 
+commands="${commands} /sbin/reboot;";
 commands="${commands} exit;";
-echo -e $commands; exit;
 file_name="vintage.remote.initialize.${random}.sh";
 file_path="/tmp/${file_name}";
 echo -e ${commands} > ${file_path};
