@@ -37,6 +37,7 @@
 
             final public static function where(array $p = []) {
 
+$a = $p;
                 $sql    = ' ';
                 $params = ['and'=>[],'or'=>[]];
                 $where  = ['and'=>[],'or'=>[]];
@@ -89,13 +90,110 @@
                             $params['and'], $params['or']);
                     }
 
-                    if (!empty($where['and'])) {
-                        $sql = ' WHERE ' . implode(' AND ', $where['and']);
-                    }
-                }
+$sqls = $where['and'];
+$params = $params['and'];
 
-                return [$sql, $params['and']];
+
+
+
+
+
+
+
+
+//================================================================================================//
+
+          if (isset($a['ors'])) {
+            foreach ($a['ors'] as $or) {
+
+              $tmps = [];
+
+              foreach ($or as $set) {
+                foreach ($set as $column => $values) {
+                  foreach ($values as $operator => $value) {
+
+                    $r = self::where_single([
+                      'column'   => $column,
+                      'operator' => $operator,
+                      'value'    => $value
+                    ]);
+
+                    $tmps[] = sprintf('(%s)', $r[0]);
+                    $params = array_merge($params, $r[1]);
+                  }
+                }
+              }
+
+              $sqls[] = sprintf('(%s)', implode(' OR ', $tmps));
             }
+          }
+        }
+
+        if (!empty($sqls)) {
+          $sql = ' WHERE ' . implode(' AND ', $sqls);
+        }
+
+        return [$sql, $params];
+      }
+
+      /**
+       * Where | Single
+       *
+       * @param  array  $a             [!]
+       * @param  string $a['column']   [!]
+       * @param  string $a['operator'] [!]
+       * @param  mixed  $a['value']    [!]
+       * @return string $sql
+       * @return array  $params
+       */
+      private static function where_single(array $a) {
+
+        $column   = @$a['column']   ?: null;
+        $operator = @$a['operator'] ?: null;
+        $value    = @$a['value']    ?: null;
+
+        $sql    = null;
+        $params = null;
+
+        if ($operator == '=') {
+          if (is_array($value)) {
+            $count     = count($value);
+            $questions = implode(',', array_pad([], $count, '?'));
+            $sql       = sprintf("$column IN (%s)", $questions);
+            $params    = $value;
+          }
+          else {
+            $sql    = "$column = ?";
+            $params = [$value];
+          }
+        }
+        elseif (in_array($operator, ['~', 'partial'])) {
+          $sql    = "$column LIKE ?";
+          $params = ["%$value%"];
+        }
+        elseif (in_array($operator, ['^', 'left'])) {
+          $sql    = "$column LIKE ?";
+          $params = ["$value%"];
+        }
+        elseif (in_array($operator, ['$', 'right'])) {
+          $sql    = "$column LIKE ?";
+          $params = ["%$value"];
+        }
+        else {
+          $sql    = "$column $operator ?";
+          $params = [$value];
+        }
+
+        return [$sql, $params];
+      }
+
+
+
+
+
+
+
+
 
             final public static function limit($a = []) {
 
