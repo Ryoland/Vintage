@@ -49,6 +49,9 @@ $a = $p;
                             foreach ($set as $name => $values) {
                                 foreach ($values as $operator => $value) {
                                     switch ($operator) {
+                                        case '~' :
+                                            $where[$logic][]  = " $name LIKE ? ";
+                                            $params[$logic][] = "%$value%"; break;
                                         case 'partial' :
                                             $where[$logic][]  = " $name LIKE ? ";
                                             $params[$logic][] = "%$value%"; break;
