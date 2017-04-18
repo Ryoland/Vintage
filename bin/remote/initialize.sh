@@ -73,7 +73,7 @@ commands="${commands} mv ${fp}.${random} ${fp};${n}";
 # Commands : User
 
 dp_home="/home/${user_name}";
-dp_root="${dp_home}/Vintage/pro";
+dp_root="${dp_home}/Vintage";
 fp_bash="${dp_home}/.bashrc";
 
 commands="${commands} groupadd ${group_name};${n}";
@@ -83,10 +83,11 @@ commands="${commands} usermod -u ${user_id} -g ${group_name} ${user_name};${n}";
 commands="${commands} mkdir -m 700 ${dp_home}/.ssh;${n}";
 commands="${commands} echo '${ssh_key}' > ${dp_home}/.ssh/authorized_keys;${n}";
 commands="${commands} chmod 600 ${dp_home}/.ssh/authorized_keys;${n}";
-commands="${commands} mkdir -p ${dp_root};${n}";
-commands="${commands} git clone https://github.com/Ryoland/Vintage.git ${dp_root}/Vintage;${n}";
+commands="${commands} mkdir -p ${dp_root}/pro;${n}";
+commands="${commands} git clone https://github.com/Ryoland/Vintage.git ${dp_root}/pro/Vintage;${n}";
 commands="${commands} echo 'export VTG_ROOT=${dp_root};'    >> ${fp_bash};${n}";
 commands="${commands} echo 'export VTG_STAGE=${user_name};' >> ${fp_bash};${n}";
+commands="${commands} echo 'export VTG_USER=${user_name};'  >> ${fp_bash};${n}";
 commands="${commands} chown -R ${user_name}:${group_name} ${dp_home};${n}";
 
 # Commands : Sudoers

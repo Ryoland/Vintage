@@ -21,7 +21,7 @@
                     );
                 } else {
                     // コメントアウトするとメール送れなくなる。
-                    include_once(str_replace('\\', '/', $class) . '.php');
+                    @include_once(str_replace('\\', '/', $class) . '.php');
                 }
             }
 
