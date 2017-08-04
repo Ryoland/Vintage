@@ -36,7 +36,7 @@
 
 
 
-      final public static function connect(array $a) {
+      public static function connect(array $a) {
 
         $dbh = null;
 
@@ -48,7 +48,7 @@
         return $dbh;
       }
 
-      final public static function dbh(array $a1 = array(), array $a2 = array() ) {
+      public static function dbh(array $a1 = array(), array $a2 = array() ) {
 
         $dbh = null;
 
@@ -79,7 +79,7 @@
         return $dbh;
       }
 
-      final public static function ping(\PDO $dbh) {
+      public static function ping(\PDO $dbh) {
 
         try {
           $dbh->query('SELECT 1');
@@ -90,9 +90,9 @@
         return true;
       }
 
-      final public static function &select(array $a1 = array(), array $a2) {
+      public static function select(array $a1 = array(), array $a2) {
 
-        $res    = &self::execute($a1, $a2);
+        $res    = self::execute($a1, $a2);
         $dbh    = $res['dbh'];
         $sth    = $res['sth'];
         $status = $res['status'];
@@ -137,9 +137,9 @@
         return $data;
       }
 
-      final public static function insert(array $a1 = array(), array $a2) {
+      public static function insert(array $a1 = array(), array $a2) {
 
-        $res    = &self::execute($a1, $a2);
+        $res    = self::execute($a1, $a2);
         $dbh    = $res['dbh'];
         $sth    = $res['sth'];
         $status = $res['status'];
@@ -169,19 +169,19 @@
         return $r;
       }
 
-      final public static function &update(array $a1 = array(), array $a2) {
-        $res = &self::execute($a1, $a2);
+      public static function update(array $a1 = array(), array $a2) {
+        $res = self::execute($a1, $a2);
         return $res;
       }
 
-      final public static function &remove(array $a1 = array(), array $a2) {
-        $res = &self::execute($a1, $a2);
+      public static function remove(array $a1 = array(), array $a2) {
+        $res = self::execute($a1, $a2);
         return $res;
       }
 
-      final public static function replace(array $a1 = array(), array $a2) {
+      public static function replace(array $a1 = array(), array $a2) {
 
-        $res    = &self::execute($a1, $a2);
+        $res    = self::execute($a1, $a2);
         $dbh    = $res['dbh'];
         $sth    = $res['sth'];
         $status = $res['status'];
@@ -212,7 +212,7 @@
       }
 
       /****/
-      final private static function &execute(array $a1, array $a2) {
+      private static function execute(array $a1, array $a2) {
 
         $sql    = isset($a2['sql'])    ? $a2['sql']    : null;
         $params = isset($a2['params']) ? $a2['params'] : array();
@@ -229,8 +229,8 @@
 
         try {
 
-          $dbh = &self::dbh($a1, $a2);
-          $sth = &$dbh->prepare($sql);
+          $dbh = self::dbh($a1, $a2);
+          $sth = $dbh->prepare($sql);
 
           if ($sth->execute($params)) {
             $r['message'] = 'Executed';
