@@ -51,7 +51,7 @@
                     $sql = sprintf(static::$DB_SQL_GET, static::$DB_TNAME);
                 }
 
-                $d =& static::db_select($sql, $a);
+                $d = static::db_select($sql, $a);
 
                 return $d;
             }
@@ -70,7 +70,7 @@
                     $sql = sprintf(static::$DB_SQL_CNT, static::$DB_TNAME);
                 }
 
-                $d =& static::db_select($sql, $a);
+                $d = static::db_select($sql, $a);
 
                 return $d[1]['status'] ? $d[0][0]['cnt'] : null;
             }
