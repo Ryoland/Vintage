@@ -74,13 +74,13 @@
                     }
                 } else { throw new \Exception(); }
 
-                $dbh =& $this->dbh_slave();
-                $o   =  [
+                $dbh = $this->dbh_slave();
+                $o   = [
                     'where' => ['and' => &$and],
                     'dbh'   => &$dbh
                 ];
 
-                $r    =& static::db_select($sql, $o);
+                $r    = static::db_select($sql, $o);
                 $rows =& $r[0];
                 $res  =& $r[1];
 

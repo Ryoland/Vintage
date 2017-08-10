@@ -113,7 +113,7 @@ $DB_CNAME = isset(static::$DB_CNAME) ? static::$DB_CNAME : static::$DB_CNAME_DEF
                         'rtype'  => 'slave',
                         'sql'    => $sql,
                         'params' => $params,
-                        'dbh'    => &$dbh
+                        'dbh'    => $dbh
                     ]);
                 }
 
