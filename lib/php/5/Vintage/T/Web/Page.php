@@ -29,7 +29,7 @@
                         }
                         elseif ($RECORD['TYPE'] == 'more') {
 
-                            $More =& new $RECORD['NAME']();
+                            $More = new $RECORD['NAME']();
 
                             $r =& $More->get([
                                 'where'       => $this->record_where(),
