@@ -108,7 +108,7 @@ $params = isset($a['params']) ? $a['params'] : [];
 
 $DB_CNAME = isset(static::$DB_CNAME) ? static::$DB_CNAME : static::$DB_CNAME_DEFAULT;
 
-                    $d =& $Database->select([
+                    $d = $Database->select([
                         'cname'  => $DB_CNAME,
                         'rtype'  => 'slave',
                         'sql'    => $sql,
