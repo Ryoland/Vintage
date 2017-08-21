@@ -113,7 +113,7 @@
                 if (!$this->is_ok()) { goto FAILURE; }
 
                 $method = 'set_' . static::$SOURCE;
-                $res    = &self::$method($p, $a);
+                $res    = self::$method($p, $a);
 
                 if ($res['status']) {
                     foreach ($p as $key => $value) {
@@ -136,7 +136,7 @@
                 return $r;
             }
 
-            final private function &set_database(array $p, array $a) {
+            final private function set_database(array $p, array $a) {
 
                 $dbh = isset($a['dbh']) ? $a['dbh'] : $this->dbh_master();
 
