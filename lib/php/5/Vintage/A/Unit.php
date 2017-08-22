@@ -208,7 +208,7 @@
                 return $r;
             }
 
-            final private function &del_database(array $a) {
+            final private function del_database(array $a) {
 
                 $dbh = isset($a['dbh']) ? $a['dbh'] : $this->dbh_master();
 
