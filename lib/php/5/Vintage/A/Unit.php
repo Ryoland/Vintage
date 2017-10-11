@@ -184,7 +184,7 @@
                 }
 
                 $method = 'del_' . static::$SOURCE;
-                $res    = &self::$method($a);
+                $res    = self::$method($a);
 
                 if ($res['status']) {
                     $this->P      = array();
