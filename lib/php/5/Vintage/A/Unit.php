@@ -155,6 +155,8 @@
 
             final private function set_database(array $p, array $a) {
 
+$x = [];
+
                 $dbh = isset($a['dbh']) ? $a['dbh'] : $this->dbh_master();
 
                 $params = array();
@@ -178,12 +180,43 @@
                     implode(' AND ', $where)
                 );
 
-                return Database::update(array(), array(
+                $r = Database::update(array(), array(
                     'sql'    => $sql,
                     'params' => $params,
                     'dbh'    => $dbh
                 ));
-            }
+
+
+
+
+#
+        if (!$r['status']) {
+          $x['message'] = 'DDatabase::update()';
+          $x['line']    = __LINE__;
+          goto NG;
+        }
+
+        unset($r);
+        ///
+
+        OK :
+        $x['message'] = 'ok';
+        $x['status']  = true;
+        goto FIN;
+
+        NG :
+        $x['status']  = false;
+        $x['class']   = __CLASS__;
+        $x['method']  = __METHOD__;
+        $x['trace']   = @$r['trace'] ?: [];
+        $x['trace'][] = $x;
+        goto FIN;
+
+        FIN : return $x;
+      }
+
+
+
 
             final public function &del($a = array()) {
 
