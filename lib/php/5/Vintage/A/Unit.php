@@ -102,39 +102,56 @@
                 return $d;
             }
 
-            final public function &set($p = array(), $a = array()) {
+            final public function set($p = array(), $a = array()) {
 
-                $r = array(
+                $x = array(
                     'status'  => false,
                     'message' => null
                 );
 
-                if (empty($p))       { goto FAILURE; }
-                if (!$this->is_ok()) { goto FAILURE; }
+                if (empty($p))       { goto NG; }
+                if (!$this->is_ok()) { goto NG; }
 
                 $method = 'set_' . static::$SOURCE;
-                $res    = self::$method($p, $a);
+                $r      = self::$method($p, $a);
 
-                if ($res['status']) {
+                if ($r['status']) {
                     foreach ($p as $key => $value) {
                         $this->P[$key] = $value;
-                    }
-                    goto SUCCESS;
-                } else {
-                    goto FAILURE;
-                }
 
-                SUCCESS :
-                $r['status'] = true;
-                goto LAST;
 
-                FAILURE :
-                $r['status'] = false;
-                goto LAST;
 
-                LAST :
-                return $r;
-            }
+
+#
+          }
+        }
+        else {
+          $x['message'] = "self::$method()";
+          $x['line']    = __LINE__;
+          goto NG;
+        }
+
+        unset($r);
+        ///
+
+        OK :
+        $x['message'] = 'ok';
+        $x['status']  = true;
+        goto FIN;
+
+        NG :
+        $x['status']  = false;
+        $x['class']   = __CLASS__;
+        $x['method']  = __METHOD__;
+        $x['trace']   = @$r['trace'] ?: [];
+        $x['trace'][] = $x;
+        goto FIN;
+
+        FIN : return $x;
+      }
+
+
+
 
             final private function set_database(array $p, array $a) {
 
