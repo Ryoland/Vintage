@@ -217,14 +217,11 @@
         $sql    = isset($a2['sql'])    ? $a2['sql']    : null;
         $params = isset($a2['params']) ? $a2['params'] : array();
 
-        $r = array(
-          'status'  => null,
-          'message' => null,
+        $x = array(
           'dbh'     => null,
           'sth'     => null,
           'sql'     => $sql,
-          'params'  => $params,
-          'trace'   => array()
+          'params'  => $params
         );
 
         try {
@@ -233,45 +230,44 @@
           $sth = $dbh->prepare($sql);
 
           if ($sth->execute($params)) {
-            $r['message'] = 'Executed';
-            $r['line']    = __LINE__;
-            $r['dbh']     = &$dbh;
-            $r['sth']     = &$sth;
-            goto SUCCESS;
-          } else {
+            $x['dbh'] = $dbh;
+            $x['sth'] = $sth;
+          }
+          else {
             $errorInfo    = $sth->errorInfo();
-            $r['message'] = implode(', ', $errorInfo);
-            $r['line']    = __LINE__;
-            goto FAILURE;
+            $x['message'] = implode(', ', $errorInfo);
+            $x['line']    = __LINE__;
+            goto NG;
           }
 
-        } catch (\Exception $e) {
-          $r['message'] = 'Exception, ' . $e->getMessage();
-          $r['line']    = __LINE__;
-          goto FAILURE;
+        }
+        catch (\Exception $e) {
+          $x['message'] = $e->getMessage();
+          $x['line']    = __LINE__;
+          goto NG;
         }
 
-        FAILURE :
-        $r['status'] = false;
-        goto LAST;
 
-        SUCCESS :
-        $r['status'] = true;
-        goto LAST;
 
-        LAST :
-        return $r;
+
+#
+        OK :
+        $x['message'] = 'ok';
+        $x['status']  = true;
+        goto FIN;
+
+        NG :
+        $x['status']  = false;
+        $x['class']   = __CLASS__;
+        $x['method']  = __METHOD__;
+        $x['trace']   = [$x];
+        goto FIN;
+
+        FIN : return $x;
       }
 
 
 
-
-
-
-
-
-
-//===
 
       /**
        * DSN
