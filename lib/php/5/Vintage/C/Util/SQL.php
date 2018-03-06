@@ -55,9 +55,11 @@ $a = $p;
                                         case 'partial' :
                                             $where[$logic][]  = " $name LIKE ? ";
                                             $params[$logic][] = "%$value%"; break;
+                                        case '^' :
                                         case 'left' :
                                             $where[$logic][]  = " $name LIKE ? ";
                                             $params[$logic][] = "$value%"; break;
+                                        case '$' :
                                         case 'right' :
                                             $where[$logic][]  = " $name LIKE ? ";
                                             $params[$logic][] = "%$value"; break;
