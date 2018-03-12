@@ -98,7 +98,8 @@
         $status = $res['status'];
 
         $sql  = $a2['sql'];
-        $rows = array();
+        $limit  = @$a2['limit'] ?: 0;
+        $records = array();
 
         $r = array(
           'status' => $status,
@@ -123,17 +124,47 @@
             }
           }
 
-          while ($row = $sth->fetch(\PDO::FETCH_ASSOC)) {
-            $rows[] = $row;
+
+
+
+// ##
+
+          // Fetch
+          $PDO_FETCH_ASSOC = \PDO::FETCH_ASSOC;
+          $count           = 0;
+          $hs_next         = null;
+
+          if ($limit) {
+            while ($record = $sth->fetch($PDO_FETCH_ASSOC)) {
+              if (++$count <= $limit) {
+                $records[] = $record;
+              }
+              else {
+                $count  -= 1;
+                $hs_next = true;
+                break;
+              }
+            }
+          }
+          else {
+            while ($record = $sth->fetch($PDO_FETCH_ASSOC)) {
+              $count    += 1;
+              $records[] = $record;
+            }
           }
 
-          $r['count'] = $sth->rowCount();
+          $r['count']   = $count;
+          $r['hs_next'] = $hs_next;
+          ///
         }
+
+
+
 
         if (!empty($res)) unset($res['trace']);
         if (!empty($res)) $r['trace'][] = &$res;
 
-        $data = array($rows, $r);
+        $data = array($records, $r);
         return $data;
       }
 

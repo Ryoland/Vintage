@@ -113,6 +113,7 @@
             'rtype'  => 'slave',
             'sql'    => $sql,
             'params' => $params,
+            'limit'  => @$a['span'],
             'dbh'    => $dbh
           ]);
         }
