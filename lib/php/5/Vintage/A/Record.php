@@ -3,6 +3,7 @@
   namespace Vintage\A {
 
     use \Vintage\C\Util\SQL as SQL;
+    use \Vintage\C\Util\SQL as TSQL;
 
     abstract class Record extends \Vintage\A\Lib\D {
 
@@ -87,6 +88,29 @@
         if (isset($Database)) {
 
           $params = isset($a['params']) ? $a['params'] : [];
+
+
+
+
+// ##
+
+          // Where
+          if (isset($a['wheres'])) {
+            foreach ($a['wheres'] as $wherez) {
+              foreach ($wherez as $k => $where) {
+                $r      = TSQL::where($where);
+                $before = sprintf('/{{WHERE_%s}}/i', $k);
+                $after  = $r[0] ?: ' ';
+                $sql    = preg_replace($before, $after, $sql);
+                $params = array_merge($params, $r[1]);
+                unset($r);
+              }
+            }
+          }
+          ///
+
+
+
 
           if (isset($a['where'])) {
             $res    = SQL::where($a['where']);
