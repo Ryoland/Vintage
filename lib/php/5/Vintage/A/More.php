@@ -119,7 +119,12 @@
               $total  = $from + $count;
               $total += $hs_next ? 1 : 0;
 
-              $r['total'] = max($total, $item_t);
+              if ($count >= $span) {
+                $r['total'] = max($total, $item_t);
+              }
+              else {
+                $r['total'] = $total;
+              }
             }
 
             return [$records, $r];
