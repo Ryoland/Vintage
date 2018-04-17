@@ -101,12 +101,7 @@ $params = $params['and'];
 
 
 
-
-
-
-
-
-//================================================================================================//
+// ##
 
           if (isset($a['ors'])) {
             foreach ($a['ors'] as $or) {
@@ -155,7 +150,8 @@ $params = $params['and'];
 
         $column   = @$a['column']   ?: null;
         $operator = @$a['operator'] ?: null;
-        $value    = @$a['value']    ?: null;
+
+        $value = isset($a['value']) ? $a['value'] : null;
 
         $sql    = null;
         $params = null;
@@ -195,23 +191,18 @@ $params = $params['and'];
 
 
 
+      final public static function limit($a = []) {
 
+        $a   = VArray::is($a) ? $a : [$a];
+        $sql = ' ';
 
-
-
-
-            final public static function limit($a = []) {
-
-                $a   = VArray::is($a) ? $a : [$a];
-                $sql = ' ';
-
-                if (!empty($a)) {
-                    $sql = ' LIMIT ' . implode(', ', $a);
-                }
-
-                return $sql;
-            }
+        if (!empty($a)) {
+          $sql = ' LIMIT ' . implode(', ', $a);
         }
+
+        return $sql;
+      }
     }
+  }
 
 ?>
