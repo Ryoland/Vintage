@@ -109,6 +109,20 @@
           }
           ///
 
+          // Group By
+          if (isset($a['group_bys'])) {
+            foreach ($a['group_bys'] as $group_byz) {
+              foreach ($group_byz as $k => $group_by) {
+                $r      = TSQL::group_by($group_by);
+                $before = sprintf('/{{GROUP_BY_%s}}/i', $k);
+                $after  = $r ?: ' ';
+                $sql    = preg_replace($before, $after, $sql);
+                unset($r);
+              }
+            }
+          }
+          ///
+
 
 
 
