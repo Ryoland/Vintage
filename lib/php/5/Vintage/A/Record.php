@@ -79,15 +79,22 @@
 
       final protected static function &db_select($sql, array $a = []) {
 
-        $dbh = isset($a['dbh']) ? $a['dbh'] : null;
 
-        $d = [[], ['status' => false]];
+
+
+// ##
+
+        $params = @$a['params'] ?: [];
+        $dbh    = @$a['dbh']    ?: null;
+
+
+
+
+        $x = [[], ['status' => false]];
 
         $Database = static::Database();
 
         if (isset($Database)) {
-
-          $params = isset($a['params']) ? $a['params'] : [];
 
 
 
@@ -146,7 +153,7 @@
 
           $DB_CNAME = isset(static::$DB_CNAME) ? static::$DB_CNAME : static::$DB_CNAME_DEFAULT;
 
-          $d = $Database->select([
+          $x = $Database->select([
             'cname'  => $DB_CNAME,
             'rtype'  => 'slave',
             'sql'    => $sql,
@@ -156,7 +163,7 @@
           ]);
         }
 
-        return $d;
+        return $x;
       }
     }
   }

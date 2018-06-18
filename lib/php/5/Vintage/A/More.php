@@ -10,6 +10,49 @@
       protected static $DB_SQL_CNT = ' SELECT               COUNT(*) AS cnt FROM %s ';
       protected static $DB_SQL_SUM = ' SELECT                SUM(%s) AS sum FROM %s ';
 
+      final public function get(array $a = array()) {
+
+
+
+
+// ##
+
+        $a['dbh'] = @$a['dbh'] ?: $this->dbh_slave();
+
+
+
+
+        list($rows, $r) = self::divide('db_get', $a);
+
+        if (isset($a['return_res']) && $a['return_res']) {
+          return array($rows, $r);
+        }
+        else {
+          return $r['status'] ? $rows : null;
+        }
+      }
+
+
+
+
+// ##
+
+      /****/
+      final public function cnt(array $a = []) {
+        $a['dbh'] = @$a['dbh'] ?: $this->dbh_slave();
+        return self::divide('db_cnt', $a);
+      }
+
+      /****/
+      final public function sum($column, array $a = []) {
+        $a['column'] = $column;
+        $a['dbh']    = @$a['dbh'] ?: $this->dbh_slave();
+        return self::divide('db_sum', $a);
+      }
+
+
+
+
       final private static function divide($method, array $a = array()) {
         if (!VString::len(static::$SOURCE)) {
           return null;
@@ -20,27 +63,6 @@
         else {
           return null;
         }
-      }
-
-      final public function get(array $a = array()) {
-
-        list($rows, $res) = self::divide('db_get', $a);
-
-        if (isset($a['return_res']) && $a['return_res']) {
-          return array($rows, $res);
-        }
-        else {
-          return $res['status'] ? $rows : null;
-        }
-      }
-
-      final public function cnt(array $a = array()) {
-        return self::divide('db_cnt', $a);
-      }
-
-      final public function sum($column, array $a = array()) {
-        $a['column'] = $column;
-        return self::divide('db_sum', $a);
       }
 
       final private static function db_get(array $a = array()) {
