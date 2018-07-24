@@ -146,8 +146,8 @@
           }
         }
 
-        $config =  null;
-        $Config =& $this->Config();
+        $config = null;
+        $Config = $this->Config();
 
         if (isset($Config)) {
           $VINTAGE = $Config->VINTAGE;
@@ -284,7 +284,7 @@
           $data =& $this->data();
         }
         else {
-          $data =& $this->build();
+          $data = $this->build();
         }
 
         if (isset($data['data'])) {
