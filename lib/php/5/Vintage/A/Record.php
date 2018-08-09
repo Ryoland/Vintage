@@ -165,6 +165,55 @@
 
         return $x;
       }
+
+
+
+
+// ##
+
+      protected static function sql(array $a = []) {
+
+        $sql = null;
+
+        $db_sql_name = @$a['db_sql_name'] ?: null;
+        $db_sql_type = @$a['db_sql_type'] ?: 'get';
+
+        $db_sql_names = (array) $db_sql_name;
+        $db_sql_names = array_filter($db_sql_names);
+
+        if (!empty($db_sql_names)) {
+
+          $sqls    = [];
+          $DB_SQLS = null;
+
+          switch (true) {
+            case ($db_sql_type == 'get') : $DB_SQLS = static::$DB_SQLS_GET; break;
+            case ($db_sql_type == 'cnt') : $DB_SQLS = static::$DB_SQLS_CNT; break;
+            case ($db_sql_type == 'sum') : $DB_SQLS = static::$DB_SQLS_SUM; break;
+          }
+
+          for ($i = 0; $i < count($db_sql_names); $i++) {
+
+            $db_sql_name_ = $db_sql_names[$i];
+
+            if (isset($DB_SQLS[$db_sql_name_])) {
+              $sqls[] = $DB_SQLS[$db_sql_name_];
+            }
+          }
+
+          $sql = implode(' UNION ALL ', $sqls);
+        }
+
+        if (!$sql) {
+          switch (true) {
+            case ($db_sql_type == 'get') : $sql = sprintf(static::$DB_SQL_GET, static::$DB_TNAME); break;
+            case ($db_sql_type == 'cnt') : $sql = sprintf(static::$DB_SQL_CNT, static::$DB_TNAME); break;
+            case ($db_sql_type == 'sum') : $sql = sprintf(static::$DB_SQL_SUM, static::$DB_TNAME); break;
+          }
+        }
+
+        return $sql;
+      }
     }
   }
 

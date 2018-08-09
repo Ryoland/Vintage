@@ -65,28 +65,21 @@
         }
       }
 
-      final private static function db_get(array $a = array()) {
-
-        $sql_name = isset($a['db_sql_name']) ? $a['db_sql_name'] : null;
-
-        if (isset($sql_name)) {
-          if (isset(static::$DB_SQLS_GET[$sql_name])) {
-            $sql = static::$DB_SQLS_GET[$sql_name];
-          }
-        }
-
-        if (!isset($sql)) {
-          $sql = sprintf(static::$DB_SQL_GET, static::$DB_TNAME);
-        }
-
 
 
 
 // ##
 
+      final private static function db_get(array $a = []) {
+
         $db_sql_name = @$a['db_sql_name'] ?: null;
         $limit       = @$a['limit']       ?: [];
         $page        = @$a['page']        ?: [];
+
+        $sql = static::sql([
+          'db_sql_name' => $db_sql_name,
+          'db_sql_type' => 'get'
+        ]);
 
         // Limit
         $limit = (array) $limit;
