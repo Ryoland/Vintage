@@ -80,8 +80,15 @@ $a = $p;
                                             }
                                             break;
                                         default :
-                                            $where[$logic][]  = " $name $operator ? ";
-                                            $params[$logic][] = $value; break;
+
+                                            $r = self::where_single([
+                                              'column'   => $name,
+                                              'operator' => $operator,
+                                              'value'    => $value
+                                            ]);
+
+                                            $where[$logic][] = $r[0];
+                                            $params[$logic]  = array_merge($params[$logic], $r[1]);
                                     }
                                 }
                             }
