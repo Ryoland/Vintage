@@ -39,8 +39,8 @@
 
 $a = $p;
                 $sql    = ' ';
-                $params = ['and'=>[],'or'=>[]];
-                $where  = ['and'=>[],'or'=>[]];
+                $params = ['and'=>[],'or'=>[],'ors'=>[]];
+                $where  = ['and'=>[],'or'=>[],'ors'=>[]];
 
                 if (!empty($p)) {
 
