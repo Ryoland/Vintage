@@ -156,15 +156,16 @@ $params = $params['and'];
         $sql    = null;
         $params = null;
 
-        if ($operator == '=') {
+        if (in_array($operator, ['=', '!='])) {
           if (is_array($value)) {
             $count     = count($value);
             $questions = implode(',', array_pad([], $count, '?'));
-            $sql       = sprintf("$column IN (%s)", $questions);
+            $operator2 = ($operator == '=') ? 'IN' : 'NOT IN';
+            $sql       = sprintf("$column $operator2 (%s)", $questions);
             $params    = $value;
           }
           else {
-            $sql    = "$column = ?";
+            $sql    = "$column $operator ?";
             $params = [$value];
           }
         }
