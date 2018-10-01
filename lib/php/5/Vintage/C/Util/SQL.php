@@ -144,6 +144,91 @@ $params = $params['and'];
       }
 
       /**
+       * Filter
+       *
+       * @param  array  $filter [=]
+       * @return string $sql
+       * @return array  $params
+       */
+      public static function filter(array $filters = []) {
+
+        $sql    = '';
+        $params = [];
+        $sqls   = [];
+
+        foreach ($filters as $logics => $sets) {
+          if (!empty($sets)) {
+            list($sql_, $params_) = self::filter_loop($logics, $sets);
+            $sqls[] = $sql_;
+            $params = array_merge($params, $params_);
+          }
+        }
+
+        if (!empty($sqls)) {
+          $sql = ' WHERE ' . implode(' AND ', $sqls);
+        }
+
+        return [$sql, $params];
+      }
+
+      /**
+       * Filter | Loop
+       *
+       * @param  array  $filters [=]
+       * @return string $sql
+       * @return array  $params
+       */
+      private static function filter_loop($logics, array $sets) {
+
+        $logics = explode('_', $logics);
+        $sql    = '';
+        $params = [];
+
+        if (count($logics) == 1) {
+
+          $logic = $logics[0];
+          $tmps  = [];
+
+          foreach ($sets as $set) {
+            foreach ($set as $column => $values) {
+              foreach ($values as $operator => $value) {
+
+                $r = self::where_single([
+                  'column'   => $column,
+                  'operator' => $operator,
+                  'value'    => $value
+                ]);
+
+                $tmps[] = sprintf('(%s)', $r[0]);
+                $params = array_merge($params, $r[1]);
+              }
+            }
+          }
+
+          $sql = sprintf('(%s)', implode(" $logic ", $tmps));
+          $sql = "($sql)";
+        }
+        else {
+
+          $logic  = array_shift($logics);
+          $logics = implode('_', $logics);
+
+          $sqls = [];
+
+          foreach ($sets as $set) {
+            list($sql_, $params_) = self::filter_loop($logics, $set);
+            $sqls[] = $sql_;
+            $params = array_merge($params, $params_);
+          }
+
+          $sql = implode(" $logic ", $sqls);
+          $sql = "($sql)";
+        }
+
+        return [$sql, $params];
+      }
+
+      /**
        * Where | Single
        *
        * @param  array  $a             [!]

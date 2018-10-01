@@ -101,6 +101,26 @@
 
 // ##
 
+          // Filters
+          if (isset($a['filters'])) {
+            foreach ($a['filters'] as $k => $filter) {
+              $r      = TSQL::filter($filter);
+              $before = sprintf('/{{WHERE_%s}}/i', $k);
+              $after  = $r[0] ?: ' ';
+
+              if (preg_match($before, $sql)) {
+                $sql = preg_replace($before, $after, $sql);
+              }
+              else {
+                $sql .= " $after";
+              }
+
+              $params = array_merge($params, $r[1]);
+              unset($r);
+            }
+          }
+          ///
+
           // Where
           if (isset($a['wheres'])) {
             foreach ($a['wheres'] as $wherez) {
