@@ -69,16 +69,18 @@
 
         if ($A['key_type'] == 'primary') {
           foreach (static::db_pkey() as $key) {
-            $name  = static::$DB_TNAME . ".$key";
-            $value = $this->XKEYS[$key];
-            $and[] = [$name => ['=' => $value]];
+            $name     = static::$DB_TNAME . ".$key";
+            $value    = $this->XKEYS[$key];
+            $operator = isset($value) ? '=' : 'IS';
+            $and[]    = [$name => [$operator => $value]];
           }
         }
         elseif ($A['key_type'] == 'unique') {
           foreach (static::$DB_UKEYS[$A['key_name']] as $key) {
-            $name  = static::$DB_TNAME . ".$key";
-            $value = $this->XKEYS[$key];
-            $and[] = [$name => ['=' => $value]];
+            $name     = static::$DB_TNAME . ".$key";
+            $value    = $this->XKEYS[$key];
+            $operator = isset($value) ? '=' : 'IS';
+            $and[]    = [$name => [$operator => $value]];
           }
         }
         else {
