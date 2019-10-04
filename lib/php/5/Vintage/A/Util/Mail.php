@@ -41,6 +41,25 @@
 
             final public function send(array $a) {
 
+
+
+
+
+
+
+
+
+        $format      = @$a['format']      ?: 'text';
+        $attachments = @$a['attachments'] ?: [];
+
+
+
+
+
+
+
+
+
                 $from    = $a['from'];
                 $to      = $a['to'];
                 $subject = $a['subject'];
@@ -57,6 +76,26 @@
                     $host = $this->host_smtp();
 
                     $res = self::send_smtp(array(
+
+
+
+
+
+
+
+
+
+            'format'      => $format,
+            'attachments' => $attachments,
+
+
+
+
+
+
+
+
+
                         'from'    => $from,
                         'to'      => $to,
                         'subject' => $subject,
@@ -73,6 +112,25 @@
             }
 
             final public static function send_smtp(array $a) {
+
+
+
+
+
+
+
+
+
+        $format      = @$a['format']      ?: 'text';
+        $attachments = @$a['attachments'] ?: [];
+
+
+
+
+
+
+
+
 
                 $from    = $a['from'];
                 $to      = $a['to'];
@@ -100,7 +158,7 @@
                 $name    = isset($name) ? mb_encode_mimeheader($name)     : $name;
                 $label   = isset($name) ? sprintf('%s<%s>', $name, $from) : $from;
                 $subject = mb_encode_mimeheader($subject);
-                $message = mb_convert_encoding($message, $charset, 'auto');
+//              $message = mb_convert_encoding($message, $charset, 'auto');
 
                 $params = array(
                     'host'     => $host['host'],
@@ -120,6 +178,41 @@
                 $headers['To']      = implode(',', $tos);
                 $headers['Cc']      = implode(',', $ccs);
                 $headers['Subject'] = $subject;
+
+
+
+
+
+
+
+
+
+        if ($format == 'html') {
+
+          require_once('Mail/mime.php');
+
+          $Mail_Mime = new \Mail_Mime("\n");
+          $Mail_Mime->setHTMLBody($message);
+
+          $message = $Mail_Mime->get([
+            'head_charset' => self::$SMTP_CHARSET,
+            'html_charset' => self::$SMTP_ENCODING
+          ]);
+
+          $headers = $Mail_Mime->headers($headers);
+        }
+        else {
+
+          $message = mb_convert_encoding($message, self::$SMTP_CHARSET, 'auto');
+        }
+
+
+
+
+
+
+
+
 
                 $Mail = \Mail::factory('smtp', $params);
                 $res  = $Mail->send($recipients, $headers, $message);
