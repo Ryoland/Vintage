@@ -10,7 +10,11 @@
 
             private static $SMTP_CHARSET             = 'ISO-2022-JP';
             private static $SMTP_ENCODING            = 'utf8';
-            private static $SMTP_HEADER_CONTENT_TYPE = 'text/plain; charset=ISO-2022-JP';
+            private static $SMTP_HEADER_CONTENT_TYPE = [
+              'plain' => 'text/plain; charset=ISO-2022-JP',
+              'text'  => 'text/plain; charset=ISO-2022-JP',
+              'html'  => 'text/html; charset=ISO-2022-JP',
+            ];
             private static $SMTP_HEADER_X_MAILER     = 'Vintage';
             private static $SMTP_LANGUAGE            = 'ja';
 
@@ -170,7 +174,7 @@
 
                 $headers = array_merge(array(
                     'Return-Path'  => $from,
-                    'Content-Type' => self::$SMTP_HEADER_CONTENT_TYPE,
+                    'Content-Type' => self::$SMTP_HEADER_CONTENT_TYPE[$format],
                     'X-Mailer'     => self::$SMTP_HEADER_X_MAILER
                 ), $headers);
 
@@ -187,23 +191,76 @@
 
 
 
+        // $Mail_Mime
+        $Mail_Mime = null;
+        $ir_mime   = false;
+
         if ($format == 'html') {
+          $ir_mime = true;
+        }
+        elseif (!empty($attachments)) {
+          $ir_mime = true;
+        }
+
+        if ($ir_mime) {
 
           require_once('Mail/mime.php');
 
           $Mail_Mime = new \Mail_Mime("\n");
-          $Mail_Mime->setHTMLBody($message);
+        }
+        ///
+
+        // Body
+        if ($ir_mime) {
+          if ($format == 'html') {
+            $Mail_Mime->setHTMLBody($message);
+          }
+          else {
+            $message = mb_convert_encoding($message, self::$SMTP_CHARSET, 'auto');
+            $Mail_Mime->setTxtBody($message);
+          }
+        }
+        else {
+          $message = mb_convert_encoding($message, self::$SMTP_CHARSET, 'auto');
+        }
+        ///
+
+        // Attachments
+        if (!empty($attachments)) {
+          for ($i = 0; $i < count($attachments); $i++) {
+
+            $attachment = $attachments[$i];
+            $mode       = $attachment['mode'];
+
+            if ($mode == 'html_image') {
+              $Mail_Mime->addHTMLImage(
+                $attachment['data'],
+                $attachment['type'],
+                $attachment['name'],
+                false
+              );
+            }
+            elseif ($mode == 'attachment') {
+              $Mail_Mime->addAttachment(
+                $attachment['data'],
+                $attachment['type'],
+                $attachment['name'],
+                false
+              );
+            }
+          }
+        }
+        ///
+
+        if ($ir_mime) {
 
           $message = $Mail_Mime->get([
             'head_charset' => self::$SMTP_CHARSET,
-            'html_charset' => self::$SMTP_ENCODING
+            'html_charset' => self::$SMTP_ENCODING,
+            'text_charset' => self::$SMTP_CHARSET
           ]);
 
           $headers = $Mail_Mime->headers($headers);
-        }
-        else {
-
-          $message = mb_convert_encoding($message, self::$SMTP_CHARSET, 'auto');
         }
 
 
