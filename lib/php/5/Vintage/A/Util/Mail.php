@@ -69,9 +69,10 @@
                 $subject = $a['subject'];
                 $message = $a['message'];
 
-                $name = isset($a['name']) ? $a['name'] : null;
-                $cc   = isset($a['cc'])   ? $a['cc']   : array();
-                $bcc  = isset($a['bcc'])  ? $a['bcc']  : array();
+                $name    = isset($a['name'])    ? $a['name']    : null;
+                $cc      = isset($a['cc'])      ? $a['cc']      : array();
+                $bcc     = isset($a['bcc'])     ? $a['bcc']     : array();
+                $replyTo = isset($a['replyTo']) ? $a['replyTo'] : array();
 
                 $res = array();
 
@@ -107,7 +108,8 @@
                         'host'    => $host,
                         'name'    => $name,
                         'cc'      => $cc,
-                        'bcc'     => $bcc
+                        'bcc'     => $bcc,
+                        'replyTo' => $replyTo
                     ));
 
                 } else { throw new \Exception(); }
@@ -145,12 +147,14 @@
                 $name    = isset($a['name'])    ? $a['name']    : null;
                 $cc      = isset($a['cc'])      ? $a['cc']      : array();
                 $bcc     = isset($a['bcc'])     ? $a['bcc']     : array();
+                $replyTo = isset($a['replyTo']) ? $a['replyTo'] : array();
                 $charset = isset($a['charset']) ? $a['charset'] : self::$SMTP_CHARSET;
                 $headers = isset($a['headers']) ? $a['headers'] : array();
 
-                $tos        = VArray::is($to)  ? $to  : array($to);
-                $ccs        = VArray::is($cc)  ? $cc  : array($cc);
-                $bccs       = VArray::is($bcc) ? $bcc : array($bcc);
+                $tos        = VArray::is($to)      ? $to      : array($to);
+                $ccs        = VArray::is($cc)      ? $cc      : array($cc);
+                $bccs       = VArray::is($bcc)     ? $bcc     : array($bcc);
+                $replyTo    = VArray::is($replyTo) ? $replyTo : array($replyTo);
                 $recipients = array_merge($tos, $ccs, $bccs);
 
                 $mb_language_tmp = mb_language();
@@ -178,10 +182,11 @@
                     'X-Mailer'     => self::$SMTP_HEADER_X_MAILER
                 ), $headers);
 
-                $headers['From']    = $label;
-                $headers['To']      = implode(',', $tos);
-                $headers['Cc']      = implode(',', $ccs);
-                $headers['Subject'] = $subject;
+                $headers['From']     = $label;
+                $headers['To']       = implode(',', $tos);
+                $headers['Cc']       = implode(',', $ccs);
+                $headers['Reply-To'] = implode(',', $replyTo);
+                $headers['Subject']  = $subject;
 
 
 
