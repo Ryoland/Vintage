@@ -248,6 +248,16 @@ $params = $params['and'];
         $sql    = null;
         $params = null;
 
+
+
+
+////
+        $NOT = preg_match('/^\!/', $operator) ? 'NOT' : '';
+////
+
+
+
+
         if (in_array($operator, ['=', '!='])) {
           if (is_array($value)) {
             $count     = count($value);
@@ -261,18 +271,32 @@ $params = $params['and'];
             $params = [$value];
           }
         }
-        elseif (in_array($operator, ['~', 'partial'])) {
-          $sql    = "$column LIKE ?";
+
+
+
+
+////
+        else if (in_array($operator, ['~', '!~'], true)) {
+          $sql    = "$column $NOT LIKE ?";
           $params = ["%$value%"];
         }
-        elseif (in_array($operator, ['^', 'left'])) {
-          $sql    = "$column LIKE ?";
+        else if (in_array($operator, ['^', '!^'], true)) {
+          $sql    = "$column $NOT LIKE ?";
           $params = ["$value%"];
         }
-        elseif (in_array($operator, ['$', 'right'])) {
-          $sql    = "$column LIKE ?";
+        else if (in_array($operator, ['$', '!$'], true)) {
+          $sql    = "$column $NOT LIKE ?";
           $params = ["%$value"];
         }
+        else if (in_array($operator, ['|', '!|'], true)) {
+          $sql    = "$column $NOT BETWEEN ? AND ?";
+          $params = [$value[0], $value[1]];
+        }
+////
+
+
+
+
         else {
           $sql    = "$column $operator ?";
           $params = [$value];
@@ -280,9 +304,6 @@ $params = $params['and'];
 
         return [$sql, $params];
       }
-
-
-
 
       final public static function limit($a = []) {
 
