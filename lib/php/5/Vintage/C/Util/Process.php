@@ -6,9 +6,9 @@
 
         final class Process extends \Vintage\A\Lib {
 
-            final public static function start(array $a = []) {
+            final public static function start(array &$process = []) {
 
-                $name = isset($a['name']) ? $a['name'] : null;
+                $name = isset($process['name']) ? $process['name'] : null;
 
                 $d = [];
 
@@ -17,7 +17,7 @@
                     goto NG;
                 }
 
-                $file = self::path($a);
+                $file = self::path($process);
 
                 if (file_exists($file)) {
 
@@ -43,6 +43,16 @@
                     $d['message'] = 'Failed to write file.';
                     goto NG;
                 }
+
+
+
+
+////
+        $process['id'] = $id;
+////
+
+
+
 
                 $d['id'] = $id;
 
