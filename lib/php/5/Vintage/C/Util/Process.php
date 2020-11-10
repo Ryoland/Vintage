@@ -6,7 +6,7 @@
 
         final class Process extends \Vintage\A\Lib {
 
-            final public static function start(array &$process = []) {
+            final public static function start(array $process = []) {
 
                 $name = isset($process['name']) ? $process['name'] : null;
 
