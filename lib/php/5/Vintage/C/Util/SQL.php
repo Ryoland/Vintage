@@ -1,137 +1,266 @@
 <?php
 
-    namespace Vintage\C\Util {
+  namespace Vintage\C\Util {
 
-        use \Vintage\C\PHP\VArray as VArray;
+    use \Vintage\C\PHP\VArray as VArray;
 
-        final class SQL extends \Vintage\A\Lib\S {
+    final class SQL extends \Vintage\A\Lib\S {
 
-            final public static function group_by($a = []) {
 
-                $a   = VArray::is($a) ? $a : [$a];
-                $sql = ' ';
+/**/
 
-                if (!empty($a)) {
-                    $sql = ' GROUP BY ' . implode(', ', $a);
-                }
+      private static $combinationz = [
+        'and_and' => ['sort' => 0],
+        'and_or'  => ['sort' => 1],
+        'or_and'  => ['sort' => 2],
+        'or_or'   => ['sort' => 3]
+      ];
 
-                return $sql;
+      private static $combinations = [];
+
+      private static function combinations():array {
+
+        if (empty(self::$combinations)) {
+
+          // $sorts
+          $sorts = [];
+
+          foreach (self::$combinationz as $k => $combination) {
+            $sorts[] = $combination['sort'];
+          }
+
+          $sorts = array_unique($sorts);
+          $sorts = array_values($sorts);
+
+          sort($sorts);
+          ///
+
+          // self::$combinations
+          $combinations = [];
+
+          foreach ($sorts as $sort) {
+            foreach (self::$combinationz as $combination_name => $combination) {
+              if ($combination['sort'] == $sort) {
+                $combination['name'] = $combination_name;
+                $combinations[]      = $combination;
+              }
             }
+          }
 
-            final public static function order_by(array $a = []) {
+          self::$combinations = $combinations;
+          ///
+        }
 
-                $sql      = ' ';
-                $order_by = [];
+        return self::$combinations;
+      }
 
-                if (!empty($a)) {
-                    foreach ($a as $pair) {
-                        foreach ($pair as $key => $value) {
-                            $order_by[] = " $key $value ";
-                        }
-                    }
-                    $sql = ' ORDER BY ' . implode(', ', $order_by);
-                }
+/**/
 
-                return $sql;
+
+      public static function group_by($a = []) {
+
+        $a   = VArray::is($a) ? $a : [$a];
+        $sql = ' ';
+
+        if (!empty($a)) {
+          $sql = ' GROUP BY ' . implode(', ', $a);
+        }
+
+        return $sql;
+      }
+
+      public static function order_by(array $a = []) {
+
+        $sql      = ' ';
+        $order_by = [];
+
+        if (!empty($a)) {
+          foreach ($a as $pair) {
+            foreach ($pair as $key => $value) {
+              $order_by[] = " $key $value ";
             }
+          }
+          $sql = ' ORDER BY ' . implode(', ', $order_by);
+        }
 
-            final public static function where(array $p = []) {
+        return $sql;
+      }
 
-$a = $p;
-                $sql    = ' ';
-                $params = ['and'=>[],'or'=>[],'ors'=>[]];
-                $where  = ['and'=>[],'or'=>[],'ors'=>[]];
+      public static function where(array $a = []) {
 
-                if (!empty($p)) {
+        $sql    = ' ';
+        $params = ['and'=>[],'or'=>[],'ors'=>[]];
+        $where  = ['and'=>[],'or'=>[],'ors'=>[]];
 
-                    foreach ($p as $logic => $sets) {
-                        foreach ($sets as $set) {
-                            foreach ($set as $name => $values) {
-                                foreach ($values as $operator => $value) {
-                                    switch ($operator) {
-                                        case '~' :
-                                            $where[$logic][]  = " $name LIKE ? ";
-                                            $params[$logic][] = "%$value%"; break;
-                                        case 'partial' :
-                                            $where[$logic][]  = " $name LIKE ? ";
-                                            $params[$logic][] = "%$value%"; break;
-                                        case '^' :
-                                        case 'left' :
-                                            $where[$logic][]  = " $name LIKE ? ";
-                                            $params[$logic][] = "$value%"; break;
-                                        case '$' :
-                                        case 'right' :
-                                            $where[$logic][]  = " $name LIKE ? ";
-                                            $params[$logic][] = "%$value"; break;
-                                        case '=' :
-                                            if (VArray::is($value)) {
-                                                $questions = [];
-                                                foreach ($value as $buffer) {
-                                                    $questions[]      = '?';
-                                                    $params[$logic][] = $buffer;
-                                                }
-                                                $where[$logic][] = sprintf(
-                                                    " $name in (%s) ",
-                                                    implode(',', $questions)
-                                                );
-                                            } else {
-                                                $where[$logic][]  = " $name $operator ? ";
-                                                $params[$logic][] = $value;
-                                            }
-                                            break;
-                                        default :
+        foreach ($a as $logic => $sets) {
+          if (in_array($logic, ['and', 'or', 'ors'])) {
+            foreach ($sets as $set) {
+              foreach ($set as $name => $values) {
+                foreach ($values as $operator => $value) {
+                  switch ($operator) {
+                    case '~' :
+                      $where[$logic][]  = " $name LIKE ? ";
+                      $params[$logic][] = "%$value%"; break;
+                    case 'partial' :
+                      $where[$logic][]  = " $name LIKE ? ";
+                      $params[$logic][] = "%$value%"; break;
+                    case '^'    :
+                    case 'left' :
+                      $where[$logic][]  = " $name LIKE ? ";
+                      $params[$logic][] = "$value%"; break;
+                    case '$'     :
+                    case 'right' :
+                      $where[$logic][]  = " $name LIKE ? ";
+                      $params[$logic][] = "%$value"; break;
+                    case '=' :
+                      if (VArray::is($value)) {
 
-                                            $r = self::where_single([
-                                              'column'   => $name,
-                                              'operator' => $operator,
-                                              'value'    => $value
-                                            ]);
+                        $questions = [];
 
-                                            $where[$logic][] = $r[0];
-                                            $params[$logic]  = array_merge($params[$logic], $r[1]);
-                                    }
-                                }
-                            }
+                        foreach ($value as $buffer) {
+                          $questions[]      = '?';
+                          $params[$logic][] = $buffer;
                         }
-                    }
 
-                    if (!empty($where['or'])) {
-                        $where['and'][] = sprintf(
-                            '(%s)', implode(' OR ', $where['or']));
-                        $params['and'] = array_merge(
-                            $params['and'], $params['or']);
-                    }
+                        $where[$logic][] = sprintf(" $name in (%s) ", implode(',', $questions));
+                      }
+                      else {
+                        $where[$logic][]  = " $name $operator ? ";
+                        $params[$logic][] = $value;
+                      }
+                      break;
+                    default :
 
-$sqls = $where['and'];
-$params = $params['and'];
+                      $r = self::where_single([
+                        'column'   => $name,
+                        'operator' => $operator,
+                        'value'    => $value
+                      ]);
 
-
-
-
-// ##
-
-          if (isset($a['ors'])) {
-            foreach ($a['ors'] as $or) {
-
-              $tmps = [];
-
-              foreach ($or as $set) {
-                foreach ($set as $column => $values) {
-                  foreach ($values as $operator => $value) {
-
-                    $r = self::where_single([
-                      'column'   => $column,
-                      'operator' => $operator,
-                      'value'    => $value
-                    ]);
-
-                    $tmps[] = sprintf('(%s)', $r[0]);
-                    $params = array_merge($params, $r[1]);
+                      $where[$logic][] = $r[0];
+                      $params[$logic]  = array_merge($params[$logic], $r[1]);
                   }
                 }
               }
+            }
+          }
+        }
 
-              $sqls[] = sprintf('(%s)', implode(' OR ', $tmps));
+        if (!empty($where['or'])) {
+          $where['and'][] = sprintf('(%s)', implode(' OR ', $where['or']));
+          $params['and']  = array_merge($params['and'], $params['or']);
+        }
+
+        $sqls   = $where['and'];
+        $params = $params['and'];
+
+        if (isset($a['ors'])) {
+          foreach ($a['ors'] as $or) {
+
+            $tmps = [];
+
+            foreach ($or as $set) {
+              foreach ($set as $column => $values) {
+                foreach ($values as $operator => $value) {
+
+                  $r = self::where_single([
+                    'column'   => $column,
+                    'operator' => $operator,
+                    'value'    => $value
+                  ]);
+
+                  $tmps[] = sprintf('(%s)', $r[0]);
+                  $params = array_merge($params, $r[1]);
+                }
+              }
+            }
+
+            $sqls[] = sprintf('(%s)', implode(' OR ', $tmps));
+          }
+        }
+
+
+/**/
+
+        if (isset($a['and_1']) && is_array($a['and_1']) && !empty($a['and_1'])) {
+          foreach ($a['and_1'] as $set) {
+            foreach ($set as $column => $values) {
+              foreach ($values as $operator => $value) {
+
+                $r = self::where_single([
+                  'column'   => $column,
+                  'operator' => $operator,
+                  'value'    => $value
+                ]);
+
+                $sqls[] = '(' . $r[0] . ')';
+                $params = array_merge($params, $r[1]);
+              }
+            }
+          }
+        }
+
+        foreach (self::combinations() as $combination) {
+
+          $combination_name = $combination['name'];
+          $groups           = $a[$combination_name] ?? [];
+
+          if (is_array($groups) && !empty($groups)) {
+
+            list($condition_1, $condition_2) = explode('_', $combination_name);
+
+            foreach ($groups as $group) {
+
+              $sqls_t_1 = [];
+
+              foreach ($group as $sets) {
+
+                $sqls_t_2 = [];
+
+                foreach ($sets as $set) {
+                  foreach ($set as $column => $values) {
+                    foreach ($values as $operator => $value) {
+
+                      $r = self::where_single([
+                        'column'   => $column,
+                        'operator' => $operator,
+                        'value'    => $value
+                      ]);
+
+                      $sqls_t_2[] = '(' . $r[0] . ')';
+                      $params     = array_merge($params, $r[1]);
+                    }
+                  }
+                }
+
+                if (!empty($sqls_t_2)) {
+                  $glue       = strtoupper(" $condition_1 ");
+                  $sqls_t_1[] = '(' . implode($glue, $sqls_t_2) . ')';
+                }
+              }
+
+              if (!empty($sqls_t_1)) {
+                $glue   = strtoupper(" $condition_2 ");
+                $sqls[] = '(' . implode($glue, $sqls_t_1) . ')';
+              }
+            }
+          }
+        }
+
+        if (isset($a['and_2']) && is_array($a['and_2']) && !empty($a['and_2'])) {
+          foreach ($a['and_2'] as $set) {
+            foreach ($set as $column => $values) {
+              foreach ($values as $operator => $value) {
+
+                $r = self::where_single([
+                  'column'   => $column,
+                  'operator' => $operator,
+                  'value'    => $value
+                ]);
+
+                $sqls[] = '(' . $r[0] . ')';
+                $params = array_merge($params, $r[1]);
+              }
             }
           }
         }
@@ -142,6 +271,9 @@ $params = $params['and'];
 
         return [$sql, $params];
       }
+
+/**/
+
 
       /**
        * Filter
@@ -305,7 +437,7 @@ $params = $params['and'];
         return [$sql, $params];
       }
 
-      final public static function limit($a = []) {
+      public static function limit($a = []) {
 
         $a   = VArray::is($a) ? $a : [$a];
         $sql = ' ';
