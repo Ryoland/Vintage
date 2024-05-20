@@ -12,15 +12,7 @@
 
       final public function get(array $a = array()) {
 
-
-
-
-// ##
-
         $a['dbh'] = @$a['dbh'] ?: $this->dbh_slave();
-
-
-
 
         list($rows, $r) = self::divide('db_get', $a);
 
@@ -31,11 +23,6 @@
           return $r['status'] ? $rows : null;
         }
       }
-
-
-
-
-// ##
 
       /****/
       final public function cnt(array $a = []) {
@@ -50,9 +37,6 @@
         return self::divide('db_sum', $a);
       }
 
-
-
-
       final private static function divide($method, array $a = array()) {
         if (!VString::len(static::$SOURCE)) {
           return null;
@@ -64,11 +48,6 @@
           return null;
         }
       }
-
-
-
-
-// ##
 
       final private static function db_get(array $a = []) {
 
@@ -154,26 +133,37 @@
       }
 
 
+      /**/
 
+      /****/
+      private static function db_cnt(array $a = []) {
 
-      final private static function db_cnt(array $a = array()) {
+        $cnt = null;
 
-        $sql_name = isset($a['db_sql_name']) ? $a['db_sql_name'] : null;
+        $db_sql_name = $a['db_sql_name'] ?? null;
 
-        if (isset($sql_name)) {
-          if (isset(static::$DB_SQLS_GET[$sql_name])) {
-            $sql = static::$DB_SQLS_CNT[$sql_name];
-          }
+        $sql = static::sql([
+          'db_sql_name' => $db_sql_name,
+          'db_sql_type' => 'cnt'
+        ]);
+
+        if (!$sql) goto FIN;
+
+        list($sources, $r) = static::db_select($sql, $a);
+
+        if (!$r['status']) goto FIN;
+
+        $cnt = 0;
+
+        foreach ($sources as $source) {
+          $cnt += (integer) $source['cnt'];
         }
 
-        if (!isset($sql)) {
-          $sql = sprintf(static::$DB_SQL_CNT, static::$DB_TNAME);
-        }
-
-        $d = static::db_select($sql, $a);
-
-        return $d[1]['status'] ? $d[0][0]['cnt'] : null;
+        FIN : return $cnt;
       }
+
+      /**/
+
 
       final private static function db_sum(array $a) {
 
