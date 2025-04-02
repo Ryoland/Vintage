@@ -49,7 +49,13 @@
             $contents = file_get_contents($fp);
             $process  = unserialize($contents);
 
-            if (posix_kill($process['id'], 0)) {
+            $command        = 'ps -p ' . $process['id'];
+            $command_output = null;
+            $command_status = null;
+
+            exec($command, $command_output, $command_status);
+
+            if ($command_status === 0) {
               $count['free']--;
               $count['running']++;
             }
