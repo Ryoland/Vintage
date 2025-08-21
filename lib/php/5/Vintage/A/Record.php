@@ -15,7 +15,14 @@
       private $dbh_slave  = null;
       private $use_master = null;
 
-      public function &dbh_master() {
+
+
+
+      /****/
+      public function dbh_master():\PDO {
+
+
+
 
         if (static::$SOURCE != 'database') return null;
 
@@ -36,17 +43,24 @@
         return $this->dbh_master;
       }
 
-      public function &dbh_master_forced() {
+      public function dbh_master_forced() {
 
         $dbh_master = null;
 
         if ($this->use_master()) {
-          $dbh_master =& $this->dbh_master();
+          $dbh_master = $this->dbh_master();
         }
         return $dbh_master;
       }
 
-      public function &dbh_slave() {
+
+
+
+      /****/
+      public function dbh_slave():\PDO {
+
+
+
 
         if (static::$SOURCE != 'database') return null;
 
@@ -87,7 +101,7 @@
         return $this->use_master;
       }
 
-      final protected static function &db_select($sql, array $a = []) {
+      final protected static function db_select($sql, array $a = []) {
 
         $params = @$a['params'] ?: [];
         $dbh    = @$a['dbh']    ?: null;
