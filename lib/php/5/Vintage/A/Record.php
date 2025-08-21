@@ -15,7 +15,7 @@
       private $dbh_slave  = null;
       private $use_master = null;
 
-      final public function &dbh_master() {
+      public function &dbh_master() {
 
         if (static::$SOURCE != 'database') return null;
 
@@ -24,7 +24,8 @@
         if (!isset($this->dbh_master)) {
           if (isset($this->A['dbh_master'])) {
             $this->dbh_master = $this->A['dbh_master'];
-          } else {
+          }
+          else {
             $Database = static::Database();
             $this->dbh_master = $Database->dbh(array(
               'cname' => $DB_CNAME,
@@ -35,16 +36,20 @@
         return $this->dbh_master;
       }
 
-      final public function &dbh_master_forced() {
+      public function &dbh_master_forced() {
+
         $dbh_master = null;
+
         if ($this->use_master()) {
           $dbh_master =& $this->dbh_master();
         }
         return $dbh_master;
       }
 
-      final public function &dbh_slave() {
+      public function &dbh_slave() {
+
         if (static::$SOURCE != 'database') return null;
+
         if ($this->use_master()) return $this->dbh_master();
 
         $DB_CNAME = isset(static::$DB_CNAME) ? static::$DB_CNAME : static::$DB_CNAME_DEFAULT;
@@ -52,7 +57,8 @@
         if (!isset($this->dbh_slave)) {
           if (isset($this->A['dbh_slave'])) {
             $this->dbh_slave = $this->A['dbh_slave'];
-          } else {
+          }
+          else {
             $Database = static::Database();
             $this->dbh_slave = $Database->dbh(array(
               'cname' => $DB_CNAME,
@@ -60,35 +66,31 @@
             ));
           }
         }
+
         $dbh_slave = $this->dbh_slave;
         return $dbh_slave;
       }
 
       final public function use_master($use_master = null) {
+
         if (static::$SOURCE != 'database') return null;
 
         if (isset($use_master)) {
           $this->use_master = $use_master;
         }
+
         if (!isset($use_master)) {
           $this->use_master = isset($this->A['use_master']) ?
           $this->A['use_master'] : false;
         }
+
         return $this->use_master;
       }
 
       final protected static function &db_select($sql, array $a = []) {
 
-
-
-
-// ##
-
         $params = @$a['params'] ?: [];
         $dbh    = @$a['dbh']    ?: null;
-
-
-
 
         $x = [[], ['status' => false]];
 
@@ -96,14 +98,10 @@
 
         if (isset($Database)) {
 
-
-
-
-// ##
-
           // Filters
           if (isset($a['filters'])) {
             foreach ($a['filters'] as $k => $filter) {
+
               $r      = TSQL::filter($filter);
               $before = sprintf('/{{WHERE_%s}}/i', $k);
               $after  = $r[0] ?: ' ';
@@ -125,11 +123,14 @@
           if (isset($a['wheres'])) {
             foreach ($a['wheres'] as $wherez) {
               foreach ($wherez as $k => $where) {
+
                 $r      = TSQL::where($where);
                 $before = sprintf('/{{WHERE_%s}}/i', $k);
                 $after  = $r[0] ?: ' ';
+
                 $sql    = preg_replace($before, $after, $sql);
                 $params = array_merge($params, $r[1]);
+
                 unset($r);
               }
             }
@@ -149,9 +150,6 @@
             }
           }
           ///
-
-
-
 
           if (isset($a['where'])) {
             $res    = SQL::where($a['where']);
@@ -185,11 +183,6 @@
 
         return $x;
       }
-
-
-
-
-// ##
 
       protected static function sql(array $a = []) {
 
